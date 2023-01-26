@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../dataset"
+		}
+	],
+	"settings": {
+		"python.autoComplete.extraPaths": [
+			"/home/andre/catkin_ws/devel/lib/python3/dist-packages",
+			"/opt/ros/noetic/lib/python3/dist-packages"
+		]
+	}
+}
