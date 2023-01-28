@@ -2,8 +2,6 @@
 
 import os
 import pathlib
-import random
-from matplotlib import pyplot as plt
 import torch
 from torch import nn
 from PIL import Image
@@ -13,6 +11,7 @@ from torchvision import transforms
 from typing import Tuple, Dict, List
 from timeit import default_timer as timer
 from tqdm.auto import tqdm
+from TinyVGG import TinyVGG
 
 # Set number of epochs
 NUM_EPOCHS = 500
@@ -33,8 +32,16 @@ MODEL_PATH.mkdir(parents=True, # create parent directories if needed
 )
 
 # Create model save path
-MODEL_NAME = "SAVI_model500epoch.pth"
-MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
+MODEL_RESULTS_NAME = "SAVI_modelResults500.pth"
+MODEL_RESULTS_SAVE_PATH = MODEL_PATH / MODEL_RESULTS_NAME
+
+# Create model save path
+MODEL_DICT_NAME = "SAVI_modelDict500.pth"
+MODEL_DICT_SAVE_PATH = MODEL_PATH / MODEL_DICT_NAME
+
+# Create model save path
+MODEL_COMP_NAME = "SAVI_modelComp500.pth"
+MODEL_COMP_SAVE_PATH = MODEL_PATH / MODEL_COMP_NAME
 
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu' # cuda: 0 index of gpu
 
@@ -116,55 +123,6 @@ class ImageFolderCustom(Dataset):
             return self.transform(img), class_idx # return data, label (X, y)
         else:
             return img, class_idx # return data, label (X, y)
-
-
-class TinyVGG(nn.Module):
-    """
-    Model architecture copying TinyVGG from: 
-    https://poloclub.github.io/cnn-explainer/
-    """
-    def __init__(self, input_shape: int, hidden_units: int, output_shape: int) -> None:
-        super().__init__()
-        self.conv_block_1 = nn.Sequential(
-            nn.Conv2d(in_channels=input_shape, 
-                      out_channels=hidden_units, 
-                      kernel_size=3, # how big is the square that's going over the image?
-                      stride=1, # default
-                      padding=1), # options = "valid" (no padding) or "same" (output has same shape as input) or int for specific number 
-            nn.ReLU(),
-            nn.Conv2d(in_channels=hidden_units, 
-                      out_channels=hidden_units,
-                      kernel_size=3,
-                      stride=1,
-                      padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2,
-                         stride=2) # default stride value is same as kernel_size
-        )
-        self.conv_block_2 = nn.Sequential(
-            nn.Conv2d(hidden_units, hidden_units, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(hidden_units, hidden_units, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2)
-        )
-        self.classifier = nn.Sequential(
-            nn.Flatten(),
-            # Where did this in_features shape come from? 
-            # It's because each layer of our network compresses and changes the shape of our inputs data.
-            nn.Linear(in_features=hidden_units*16*16,
-                      out_features=output_shape)
-        )
-    
-    def forward(self, x: torch.Tensor):
-        x = self.conv_block_1(x)
-        # print(x.shape)
-        x = self.conv_block_2(x)
-        # print(x.shape)
-        x = self.classifier(x)
-        # print(x.shape)
-        return x
-        # return self.classifier(self.conv_block_2(self.conv_block_1(x))) # <- leverage the benefits of operator fusion
 
 def train_step(model: torch.nn.Module, 
                dataloader: torch.utils.data.DataLoader, 
@@ -281,7 +239,6 @@ def train(model: torch.nn.Module,
     # 6. Return the filled results at the end of the epochs
     return results
 
-
 def main():
     # Turn image folders into Datasets
 
@@ -312,7 +269,6 @@ def main():
     torch.manual_seed(42) 
     torch.cuda.manual_seed(42)
 
-
     # Setup loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(params=model_1.parameters(), lr=LR_RATE)
@@ -331,9 +287,16 @@ def main():
     # End the timer and print out how long it took
     end_time = timer()
     print(f"Total training time: {end_time-start_time:.3f} seconds")
-    print(f"Saving model to: {MODEL_SAVE_PATH}")
+    model_1.to('cpu')
+    print(f"Saving model state dictionary to: {MODEL_DICT_SAVE_PATH}")
+    torch.save(obj=model_1.state_dict(), # only saving the state_dict() only saves the learned parameters
+           f=MODEL_DICT_SAVE_PATH)
+    print(f"Saving model results to: {MODEL_RESULTS_SAVE_PATH}")
     torch.save(obj=model_1_results, # only saving the state_dict() only saves the learned parameters
-           f=MODEL_SAVE_PATH)
+           f=MODEL_RESULTS_SAVE_PATH)
+    print(f"Saving model complete to: {MODEL_COMP_SAVE_PATH}")
+    torch.save(obj=model_1, # only saving the state_dict() only saves the learned parameters
+           f=MODEL_COMP_SAVE_PATH)
 
 main()
 # print(find_classes(train_dir))
