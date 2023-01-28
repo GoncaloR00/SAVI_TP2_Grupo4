@@ -1,6 +1,24 @@
 #!/usr/bin/python3
 
+import os
+import pathlib
+import random
 from matplotlib import pyplot as plt
+import torch
+from torch import nn
+from PIL import Image
+from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
+from torchvision import transforms
+from typing import Tuple, Dict, List
+from timeit import default_timer as timer
+from tqdm.auto import tqdm
+
+MODEL_PATH = pathlib.Path("./models")
+MODEL_NAME = "SAVI_model500epoch.pth"
+MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
+
+model_1_results = torch.load(f=MODEL_SAVE_PATH)
 
 def plot_loss_curves(results: Dict[str, List[float]]):
     """Plots training curves of a results dictionary.
@@ -44,3 +62,5 @@ def plot_loss_curves(results: Dict[str, List[float]]):
     plt.legend()
     
     plt.show()
+
+plot_loss_curves(model_1_results)

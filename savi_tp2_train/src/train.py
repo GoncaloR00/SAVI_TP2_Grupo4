@@ -15,12 +15,12 @@ from timeit import default_timer as timer
 from tqdm.auto import tqdm
 
 # Set number of epochs
-NUM_EPOCHS = 5
+NUM_EPOCHS = 500
 
 # Set learning rate
 LR_RATE = 0.001
 
-BATCH_SIZE = 32
+BATCH_SIZE = 256
 NUM_WORKERS = os.cpu_count()
 
 train_dir = pathlib.Path('../../../rgbd-dataset-train/')
@@ -33,7 +33,7 @@ MODEL_PATH.mkdir(parents=True, # create parent directories if needed
 )
 
 # Create model save path
-MODEL_NAME = "SAVI_model1.pth"
+MODEL_NAME = "SAVI_model500epoch.pth"
 MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
 
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu' # cuda: 0 index of gpu
