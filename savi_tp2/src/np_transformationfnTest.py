@@ -2,6 +2,7 @@
 
 import open3d as o3d
 import numpy as np
+from pointCloud_Transform import cloud2array, array2cloud
 
 view = {
 	"class_name" : "ViewTrajectory",
@@ -25,18 +26,11 @@ view = {
 
 
 # Load file
-filename = '../rgbd-scenes-v2/pcd/01.pcd'
+filename = '../../../rgbd-scenes-v2/pcd/01.pcd'
 original_pcd = o3d.io.read_point_cloud(filename)
 
-# Convert to numpy
-points = np.asarray(original_pcd.points)
-colors = np.asarray(original_pcd.colors)
-print(points[:,1].size)
-
-# Convert to open3d format
-pcd = o3d.geometry.PointCloud()
-pcd.points = o3d.utility.Vector3dVector(points)
-pcd.colors = o3d.utility.Vector3dVector(colors)
+ptc_pointsX, ptc_pointsY, ptc_pointsZ, ptc_colorsR, ptc_colorsG, ptc_colorsB = cloud2array(original_pcd)
+pcd = array2cloud(ptc_pointsX, ptc_pointsY, ptc_pointsZ, ptc_colorsR, ptc_colorsG, ptc_colorsB)
 
 # Visualize
 
