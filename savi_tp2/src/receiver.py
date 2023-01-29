@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import open3d as o3d
-import numpy as np
 import rospy
 from pointCloud_Transform import cloud2array
 from savi_tp2.msg import cloudArray

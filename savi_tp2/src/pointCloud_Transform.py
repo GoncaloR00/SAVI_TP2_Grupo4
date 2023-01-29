@@ -11,9 +11,9 @@ def cloud2array(cloud):
     ptc_colorsG = ptc_colors[:,1]
     ptc_colorsB = ptc_colors[:,2]
     return ptc_pointsX, ptc_pointsY, ptc_pointsZ, ptc_colorsR, ptc_colorsG, ptc_colorsB
-    
+
 def array2cloud(ptc_pointsX, ptc_pointsY, ptc_pointsZ, ptc_colorsR, ptc_colorsG, ptc_colorsB):
-    size = ptc_pointsX.size
+    size = np.asarray(ptc_pointsX).size
     points = np.zeros((size,3))
     colors = np.zeros((size,3))
     points[:,0] = ptc_pointsX
