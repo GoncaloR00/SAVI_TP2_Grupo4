@@ -11,13 +11,13 @@ from TinyVGG import TinyVGG
 
 MODEL_PATH = pathlib.Path("./models")
 
-MODEL_RESULTS_NAME = "SAVI_modelResultsTest.pth"
+MODEL_RESULTS_NAME = "SAVI_modelResults500.pth"
 MODEL_RESULTS_SAVE_PATH = MODEL_PATH / MODEL_RESULTS_NAME
 
-MODEL_DICT_NAME = "SAVI_modelDictTest.pth"
+MODEL_DICT_NAME = "SAVI_modelDict500.pth"
 MODEL_DICT_SAVE_PATH = MODEL_PATH / MODEL_DICT_NAME
 
-MODEL_COMP_NAME = "SAVI_modelCompTest.pth"
+MODEL_COMP_NAME = "SAVI_modelComp500.pth"
 MODEL_COMP_SAVE_PATH = MODEL_PATH / MODEL_COMP_NAME
 
 train_dir = pathlib.Path('../../../rgbd-dataset-train/')
@@ -121,7 +121,7 @@ def main():
     model_1_dict = torch.load(f=MODEL_DICT_SAVE_PATH)
     model_1.load_state_dict(model_1_dict)
     model_1.eval()
-    custom_image_path = pathlib.Path('../../../rgbd-dataset-train/') / "apple" / "apple_1_1_1_crop.png"
+    custom_image_path = pathlib.Path('../../../rgbd-dataset-train/') / "banana" / "banana_1_1_1_crop.png"
     custom_image = torchvision.io.read_image(str(custom_image_path)).type(torch.float32)
     custom_image = custom_image / 255.
     custom_image_transformed = transform_image(custom_image)
