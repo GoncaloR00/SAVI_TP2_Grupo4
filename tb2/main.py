@@ -42,7 +42,7 @@ def main():
     
     # Load PCD
     p = PointCloudProcessing()
-    p.loadPointCloud('/home/andre/catkin_ws/src/SAVI_TP2_Grupo4/tb2/pcds/03.ply')   
+    p.loadPointCloud('/home/andre/catkin_ws/src/SAVI_TP2_Grupo4/tb2/pcds/07.ply')   
     
 
     

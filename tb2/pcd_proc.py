@@ -52,7 +52,7 @@ class PointCloudProcessing():
         self.pcd = self.pcd.voxel_down_sample(voxel_size=0.01)
         print('Downsampling reduced Point Cloud from ' + str(len(self.original_pcd.points)) + ' to ' + str(len(self.pcd.points)) + ' points')
 
-    def frameadjustment(self, distance_threshold=0.1, ransac_n=5, num_iterations=120):
+    def frameadjustment(self, distance_threshold=0.1, ransac_n=4, num_iterations=120):
         
         frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=1, origin=np.array([0, 0, 0]))
 
@@ -98,15 +98,12 @@ class PointCloudProcessing():
         d_max_idx = min(range(len(detected_plane_d)), key=lambda i: abs(detected_plane_d[i]-0))
         table_pcd = detected_plane_idx[d_max_idx]
         
-        # -------- Planes in Table Plane Clustering ----------
+        # -------- Table Plane Clustering ----------
         # Clustering 
         cluster_idx = np.array(table_pcd.cluster_dbscan(eps=0.08, min_points=50))
-        
-        # Clusters Index
         objects_idx = list(set(cluster_idx))
- 
 
-        # Remove noise 
+
         if cluster_idx.any() == -1:
             objects_idx.remove(-1)  
         
@@ -203,7 +200,7 @@ class PointCloudProcessing():
         self.pcd = self.pcd.crop(self.bbox)
        
 
-        
+        #plane of the table
     def planesegmentation(self, distance_threshold=0.01, ransac_n=5, num_iterations=120):
         
         plane_model, inliers = self.pcd.segment_plane(distance_threshold,ransac_n, num_iterations)        
@@ -212,20 +209,18 @@ class PointCloudProcessing():
         self.inliers = self.pcd.select_by_index(inliers)
         self.outlier_cloud = self.pcd.select_by_index(inliers, invert=True)
         
-
+        # Clustering 
     def pcd_clustering(self):
         
-        # Clustering 
         cluster_idx = np.array(self.outlier_cloud.cluster_dbscan(eps=0.030, min_points=60, print_progress=True))
         
-        # Clusters Index
-        objects_idx = list(set(cluster_idx))
+        objects_idx = list(set(cluster_idx)) # Clusters Index
+        objects_idx.remove(-1)  
 
-        # Remove noise 
-        objects_idx.remove(-1) 
+        number_of_objects = len(objects_idx)
+        colormap = cm.Set2(list(range(0,number_of_objects)))
 
-       
-        colormap = cm.Pastel1(list(range(0,len(objects_idx))))
+
         objects=[]
         for object_idx in objects_idx:
             
@@ -237,23 +232,23 @@ class PointCloudProcessing():
             d['idx'] = str(objects_idx[object_idx])
             d['points'] = object_points
             d['color'] = colormap[object_idx, 0:3]
-            #d['points'].paint_uniform_color(d['color'])
             d['center'] = object_center
-            #print('center of object' + str(object_idx) + ': ' + str(object_center))
 
-
-            # -------------- STDeviation of each coordinate about XY and Z Axis ------------------
-
+            print('center of object' + str(object_idx) + ': ' + str(object_center))
             
+            
+
+
+            # -------------- BBox of objets ------------------
+
+
             points = len(np.asarray(object_points.points))
             x_coordinates = []
             y_coordinates = []
             z_coordinates = []
+        
             
             for num in range(points):
-                # print(np.asarray(object_points.points[num][0]))
-                # print(np.asarray(object_points.points[num][1]))
-                # print(np.asarray(object_points.points[num][2]))
                 x_coordinates.append(np.asarray(object_points.points[num][0]))
                 y_coordinates.append(np.asarray(object_points.points[num][1]))
                 z_coordinates.append(np.asarray(object_points.points[num][2]))
@@ -262,13 +257,11 @@ class PointCloudProcessing():
             y_width = max(y_coordinates) - min(y_coordinates)
             z_height = max(z_coordinates) - min(z_coordinates)
             
-           
-
             d['x_width'] =  x_width
             d['y_width'] = y_width
             d['height'] = z_height
 
-            # BBOX 
+            # BBOX
             np_points = np.ndarray((8,3), dtype=float)
             np_points[0, :] = [min(x_coordinates), min(y_coordinates), min(z_coordinates)]
             np_points[1, :] = [max(x_coordinates), min(y_coordinates), min(z_coordinates)]
@@ -284,24 +277,20 @@ class PointCloudProcessing():
             bbox_points = o3d.utility.Vector3dVector(np_points)
 
             obj_bbox = o3d.geometry.AxisAlignedBoundingBox.create_from_points(bbox_points)
-            obj_bbox.color = (0,1,0)
-            #obj_bbox.color = (d['color'])
+            obj_bbox.color = (0,0,0)
             d['bbox'] = obj_bbox
-
-            
-
-      
+                      
             objects.append(d)
             
 
         # Pass value to attributes of the class
         self.objects_properties = objects
-        
-
+    
         self.objects_to_draw=[]
 
         # to draw each object already separated
         for object in objects:
+
             self.objects_to_draw.append(object['points'])
             self.objects_to_draw.append(object['bbox'])
 
