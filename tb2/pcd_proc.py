@@ -42,15 +42,17 @@ class PointCloudProcessing():
     def loadPointCloud (self, filename):
 
         print('Loading Point Cloud from ' + filename)
-        self.originalpcd = o3d.io.read_point_cloud(filename)
-        self.pcd = self.originalpcd
+        self.pcd = o3d.io.read_point_cloud(filename)
+        self.original_pcd = copy.deepcopy(self.pcd) #backup original pcd
+        
 
     def downsample(self):
 
         # Pre Processing with Voxel downsampling
-        self.pcd = self.originalpcd.voxel_down_sample(voxel_size=0.01) 
+        self.pcd = self.pcd.voxel_down_sample(voxel_size=0.01)
+        print('Downsampling reduced Point Cloud from ' + str(len(self.original_pcd.points)) + ' to ' + str(len(self.pcd.points)) + ' points')
 
-    def frameadjustment(self, distance_threshold=0.08, ransac_n=5, num_iterations=100):
+    def frameadjustment(self, distance_threshold=0.1, ransac_n=5, num_iterations=120):
         
         frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=1, origin=np.array([0, 0, 0]))
 
@@ -73,9 +75,6 @@ class PointCloudProcessing():
             # If there is a plane that have de negative y, will be necessary make one more measurement/segmentation 
             if b < 0:
                 num_planes = 3
-            
-            # Print plane equation
-            # print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
 
             # Inlier Cloud
             inlier_cloud = table_pcd.select_by_index(inliers)
@@ -105,18 +104,16 @@ class PointCloudProcessing():
         
         # Clusters Index
         objects_idx = list(set(cluster_idx))
+ 
 
         # Remove noise 
-        #objects_idx.remove(-1) 
-
-        # If exist remove noise (bug solution)
         if cluster_idx.any() == -1:
             objects_idx.remove(-1)  
         
         # -------- Planes Caracterization ----------
 
         # Colormap
-        colormap = cm.Pastel1(list(range(0,len(objects_idx))))
+        colormap = cm.Set2(list(range(0,len(objects_idx))))
 
         # Caracterize all planes found to proceed to table detection/isolation 
         objects=[]
@@ -151,29 +148,22 @@ class PointCloudProcessing():
             if mean_xy < minimum_mean_xy:
                 minimum_mean_xy = mean_xy
                 if len(np.asarray(object['points'].points)) > 12000:
-                    #print('Mesa')
+                    
                     self.table_cloud = object['points']
                     
-                # Quando a segmentação não é bem feita dá erro aqui, é necessário colocar um try catch ou algo do genero 
+        
 
-
-        # -------- Frames ----------
-        #frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=1, origin=np.array([0, 0, 0]))
-        tables_to_draw.append(frame)
-
+       
         # -------- Visualization ----------
-        #tables_to_draw.append(object['points'])
-        #o3d.visualization.draw_geometries(tables_to_draw)
-        #o3d.visualization.draw_geometries([table_cloud])
         
         center = self.table_cloud.get_center()
         tx, ty, tz = center[0], center[1], center[2]
-        print('tx: ' + str(tx) + ' ty: ' + str(ty) + ' tz: ' + str(tz) + '\n') 
+        #print('table_x: ' + str(tx) + ' table_y: ' + str(ty) + ' table_z: ' + str(tz) + '\n') 
 
         return(-tx, -ty, -tz)
 
 
-    def frametransform(self, r, p , y, tx, ty, tz):
+    def transform(self, r, p, y, tx, ty, tz):
     
         # Rad to Deg
         r = math.pi * r/180.0
@@ -188,46 +178,42 @@ class PointCloudProcessing():
         self.pcd = self.pcd.translate((tx, ty, tz))
 
         
-    def croppcd(self, x_min, y_min, z_min, x_max, y_max, z_max):
+    def croppcd(self, min_x, min_y, min_z, max_x, max_y, max_z):
         
-        # BBOX 
+        # Bounding box 
         np_points = np.ndarray((8,3), dtype=float)
-        np_points[0, :] = [x_min, y_min, z_min]
-        np_points[1, :] = [x_max, y_min, z_min]
-        np_points[2, :] = [x_max, y_max, z_min]
-        np_points[3, :] = [x_min, y_max, z_min]
+        
 
-        np_points[4, :] = [x_min, y_min, z_max]
-        np_points[5, :] = [x_max, y_min, z_max]
-        np_points[6, :] = [x_max, y_max, z_max]
-        np_points[7, :] = [x_min, y_max, z_max]
+        np_points[0, :] = [min_x, min_y, min_z]
+        np_points[1, :] = [max_x, min_y, min_z]
+        np_points[2, :] = [max_x, max_y, min_z]
+        np_points[3, :] = [min_x, max_y, min_z]
 
+        np_points[4, :] = [min_x, min_y, max_z]
+        np_points[5, :] = [max_x, min_y, max_z]
+        np_points[6, :] = [max_x, max_y, max_z]
+        np_points[7, :] = [min_x, max_y, max_z]
+
+        #Create AABB from points
         
         bbox_points = o3d.utility.Vector3dVector(np_points)
 
         self.bbox = o3d.geometry.AxisAlignedBoundingBox.create_from_points(bbox_points)
-        self.bbox.color = (0, 1, 0)
+        self.bbox.color = (1, 0, 1)
         self.pcd = self.pcd.crop(self.bbox)
+       
 
         
-    def planesegmentation(self, distance_threshold=0.01, ransac_n=3, num_iterations=100):
+    def planesegmentation(self, distance_threshold=0.01, ransac_n=5, num_iterations=120):
         
-        plane_model, inliers = self.pcd.segment_plane(distance_threshold,ransac_n, num_iterations)
-        #plane_model, inliers = self.table_cloud.segment_plane(distance_threshold,ransac_n, num_iterations)
-        
+        plane_model, inliers = self.pcd.segment_plane(distance_threshold,ransac_n, num_iterations)        
         [a, b, c, d] = plane_model
         
-        #print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
-
         self.inliers = self.pcd.select_by_index(inliers)
-        
         self.outlier_cloud = self.pcd.select_by_index(inliers, invert=True)
         
-        #self.inliers = self.table_cloud.select_by_index(inliers)
-        #self.outlier_cloud = self.table_cloud.select_by_index(inliers, invert=True)
-        
 
-    def pcdclustering(self):
+    def pcd_clustering(self):
         
         # Clustering 
         cluster_idx = np.array(self.outlier_cloud.cluster_dbscan(eps=0.030, min_points=60, print_progress=True))

@@ -6,7 +6,6 @@ import cv2
 import copy
 import numpy as np
 import open3d as o3d
-#from scipy.spatial.transform import Rotation as R
 from pcd_proc import PointCloudProcessing
 import pcd_proc as gui
 
@@ -43,7 +42,7 @@ def main():
     
     # Load PCD
     p = PointCloudProcessing()
-    p.loadPointCloud('/home/andre/catkin_ws/src/dataset/table_detection/tb2/pcds/03.ply')   
+    p.loadPointCloud('/home/andre/catkin_ws/src/SAVI_TP2_Grupo4/tb2/pcds/03.ply')   
     
 
     
@@ -57,19 +56,20 @@ def main():
     # Calculation of the reference transformation parameters for the center of the table - In this case only for TRANS
     tx, ty, tz = p.frameadjustment()        
   
-    # Frame Transform CAM to TABLE
-    p.frametransform(0, 0, 0, tx, ty, tz)
-    p.frametransform(-108, 0, 0, 0, 0, 0)
-    p.frametransform(0, 0, -37, 0, 0, 0)
+    # Transform 
+    p.transform(0, 0, 0, tx, ty, tz)
+    p.transform(-108, 0, 0, 0, 0, 0)
+    p.transform(0, 0, -37, 0, 0, 0)
     
-    # Isolation of interest part (table + objects)
-    p.croppcd(-0.6, -0.6, -0.02, 0.6, 0.6, 0.4)
 
-    # Plane segmentation ---> Table detection and objects isolation
+    # Do a cropp (isolation of interest part)
+    p.croppcd(-0.7, -0.7, -0.07, 0.7, 0.7, 0.4)
+
+    # Plane detection( Table and objects isolation)
     p.planesegmentation()
     
     # Object Clustering
-    p.pcdclustering()
+    p.pcd_clustering()
 
     # Object isolation and caracterization
 
@@ -79,29 +79,27 @@ def main():
     # ------------------------------------
 
     #Draw BBox
-    entities_to_draw = []
+    entities = []
     bbox = o3d.geometry.LineSet.create_from_axis_aligned_bounding_box(p.bbox)
-    entities_to_draw.append(bbox)
+
+    entities.append(bbox)
     
     # Draw Table Plane
-    p.inliers.paint_uniform_color([0.9,0.9,1])
-    correct_center = p.inliers.get_center()
-    #print('correct center: ' + str(correct_center))
-    entities_to_draw.append(p.inliers) # Draw only de plane (ouliers are the objects)
+    p.inliers.paint_uniform_color([0.7,0.7,0.7])
+    center_table = p.inliers.get_center()
+    print('Center of the table: ' + str(center_table))
+    entities.append(p.inliers) # Draw only de plane
     
     # Create coordinate system
     frame = o3d.geometry.TriangleMesh().create_coordinate_frame(size=0.2, origin=np.array([0, 0, 0]))
-    entities_to_draw.append(frame)
+    entities.append(frame)
    
 
-    # Draw objects 
-    num_of_objects = len(p.objects_to_draw)
-    # print('Number of detected objects = ' + str(num_of_objects) + '     ')
-    
-    # Draw table plane + frame + objects
-    entities_to_draw = np.concatenate((entities_to_draw, p.objects_to_draw))
 
-    o3d.visualization.draw_geometries(entities_to_draw,
+    # Draw table plane + frame + objects
+    entities = np.concatenate((entities, p.objects_to_draw))
+
+    o3d.visualization.draw_geometries(entities,
                                              zoom = view['trajectory'][0]['zoom'],
                                              front = view['trajectory'][0]['front'],
                                              lookat = view['trajectory'][0]['lookat'],
