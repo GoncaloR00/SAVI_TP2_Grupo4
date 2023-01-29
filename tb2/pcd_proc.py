@@ -149,13 +149,8 @@ class PointCloudProcessing():
                     self.table_cloud = object['points']
                     
         
-
-       
-        # -------- Visualization ----------
-        
-        center = self.table_cloud.get_center()
-        tx, ty, tz = center[0], center[1], center[2]
-        #print('table_x: ' + str(tx) + ' table_y: ' + str(ty) + ' table_z: ' + str(tz) + '\n') 
+        center = self.table_cloud.get_center() # visual center of the table
+        tx, ty, tz = center[0], center[1], center[2] 
 
         return(-tx, -ty, -tz)
 
@@ -170,7 +165,6 @@ class PointCloudProcessing():
         # Rotation
         rotation = self.pcd.get_rotation_matrix_from_xyz((r, p, y))
         self.pcd.rotate(rotation, center=(0, 0, 0))
-
         # Translate
         self.pcd = self.pcd.translate((tx, ty, tz))
 
@@ -290,7 +284,8 @@ class PointCloudProcessing():
 
         # to draw each object already separated
         for object in objects:
-
+            
+            object['points'].paint_uniform_color(object['color'])
             self.objects_to_draw.append(object['points'])
             self.objects_to_draw.append(object['bbox'])
 
