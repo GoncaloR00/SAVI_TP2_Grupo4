@@ -43,7 +43,7 @@ def main():
     
     # Load PCD
     p = PointCloudProcessing()
-    p.loadPointCloud('../../rgbd-scenes-v2/pcd/10.pcd')
+    p.loadPointCloud('../../rgbd-scenes-v2/pcd/01.pcd')
     print('-----------------')
     teste = p.originalpcd
     xyz_load = np.asarray(teste.points)
