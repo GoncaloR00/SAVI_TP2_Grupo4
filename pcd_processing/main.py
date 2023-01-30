@@ -6,6 +6,7 @@ import cv2
 import copy
 import numpy as np
 import open3d as o3d
+from gtts import gTTS
 from prettytable import PrettyTable
 from prettytable.colortable import ColorTable, Themes
 from pcd_proc import PointCloudProcessing
@@ -147,6 +148,18 @@ def main():
     w.add_child(widget3d)
     app.run()
 
+    #text to speech
+    def generate_audio(objects_properties):
+        message = ""
+        for obj in objects_properties:
+            message += "O objeto " + str(obj['idx']) + " tem uma área de " + str(round(obj['area'] * 10000, 0)) + " cm2 e um volume de " + str(round(obj['volume'] * 100000, 0)) + " cm3. "
+
+        language = 'pt'
+        myobj = gTTS(text=message, lang=language, slow=False)
+        myobj.save("objetos.mp3")
+
+        os.system("start objetos.mp3")
+    
     #table of info of objects
     #x = PrettyTable() #table default
     x = ColorTable(theme=Themes.OCEAN) #table with colors
@@ -160,9 +173,29 @@ def main():
     print('')
     print('Tabela de informações dos objetos:')
     print(x)
+    generate_audio(p.objects_properties)
 
 
+    #text to speech
+    #nao funciona no meu pc
+    #engine = pyttsx3.init()
+    #engine.say("I will speak this text")
+    ##for obj in p.objects_properties:
+    #    #message = "O objeto " + str(obj['idx']) + " tem uma área de " + str(round(obj['area'] * 10000, 0)) + " cm2 e um volume de " + str(round(obj['volume'] * 100000, 0)) + " cm3."
+    #    #engine.say(message)
+#
+    #engine.runAndWait()
 
+    #outra via
+    #vai criar umn fichiero mp3 com o texto
+    #for obj in p.objects_properties:
+    #    message = "O objeto " + str(obj['idx']) + " tem uma área de " + str(round(obj['area'] * 10000, 0)) + " cm2 e um volume de " + str(round(obj['volume'] * 100000, 0)) + " cm3."
+#
+    #language = 'pt'
+    #myobj = gTTS(text=message, lang=language, slow=False)
+    #myobj.save('O que existe na cena.mp3')
+#
+    #os.system("O que existe na cena.mp3")
     
 
 
