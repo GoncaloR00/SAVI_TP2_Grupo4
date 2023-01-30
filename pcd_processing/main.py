@@ -6,6 +6,7 @@ import cv2
 import copy
 import numpy as np
 import open3d as o3d
+from prettytable import PrettyTable
 from pcd_proc import PointCloudProcessing
 import open3d.visualization.gui as gui
 import open3d.visualization.rendering as rendering
@@ -144,6 +145,20 @@ def main():
     widget3d.setup_camera(60.0, bbox, bbox.get_center())
     w.add_child(widget3d)
     app.run()
+
+    #table of info of objects
+    x = PrettyTable()
+
+    x.field_names = ["Objeto", "Area (cm2)", 'Volume (cm3)']
+    x.align = "r"
+
+    for obj in p.objects_properties:
+        x.add_row([str(obj['idx']), str(round(obj['area']*10000,0)), str(round(obj['volume']*1000000,0))])
+
+    print('')
+    print('Tabela de informações dos objetos:')
+    print(x)
+
 
 
 

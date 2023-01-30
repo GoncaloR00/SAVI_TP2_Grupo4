@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from more_itertools import locate
 import pandas as pd
 from matplotlib import cm
+from prettytable import PrettyTable
 import math
 import copy
 import os
