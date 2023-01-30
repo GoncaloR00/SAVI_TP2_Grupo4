@@ -3,19 +3,19 @@ import numpy as np
 from matplotlib import cm
 from more_itertools import locate
 
-def crop(cloud, x_min, y_min, z_min, x_max, y_max, z_max):
+def table_crop(cloud, xmin, xmax, ymin, ymax, zmin, zmax):
 
     # Table region
     np_points = np.ndarray((8,3), dtype=float)
-    np_points[0, :] = [x_min, y_min, z_min]
-    np_points[1, :] = [x_max, y_min, z_min]
-    np_points[2, :] = [x_max, y_max, z_min]
-    np_points[3, :] = [x_min, y_max, z_min]
+    np_points[0, :] = [xmin, ymin, zmin]
+    np_points[1, :] = [xmax, ymin, zmin]
+    np_points[2, :] = [xmax, ymax, zmin]
+    np_points[3, :] = [xmin, ymax, zmin]
 
-    np_points[4, :] = [x_min, y_min, z_max]
-    np_points[5, :] = [x_max, y_min, z_max]
-    np_points[6, :] = [x_max, y_max, z_max]
-    np_points[7, :] = [x_min, y_max, z_max]
+    np_points[4, :] = [xmin, ymin, zmax]
+    np_points[5, :] = [xmax, ymin, zmax]
+    np_points[6, :] = [xmax, ymax, zmax]
+    np_points[7, :] = [xmin, ymax, zmax]
 
     bbox_points = o3d.utility.Vector3dVector(np_points)
     bbox = o3d.geometry.AxisAlignedBoundingBox.create_from_points(bbox_points)
@@ -103,8 +103,8 @@ def cluster_objects(objects_cloud):
         object['points'].paint_uniform_color(object['color'])
     return objects
         
-def object_isolation(cloud, x_min, y_min, z_min, x_max, y_max, z_max):
-    cloud_table = crop(cloud, x_min, y_min, z_min, x_max, y_max, z_max)
+def object_isolation(cloud, xmin, xmax, ymin, ymax, zmin, zmax):
+    cloud_table = table_crop(cloud, xmin, xmax, ymin, ymax, zmin, zmax)
     objects_cloud = findTableTop(cloud_table)
     objects = cluster_objects(objects_cloud)
     return objects

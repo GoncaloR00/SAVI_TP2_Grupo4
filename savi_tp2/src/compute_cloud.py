@@ -5,7 +5,15 @@ from fnaux_table_recognizer import table_recognizer
 from fnaux_coord_transform import transform
 from pointCloud_Transform import cloud2array
 from fnaux_object_isolation import object_isolation
+from fnaux_object_classification import projectPoints
 import numpy as np
+# ---------------------------------------------------
+#   Parameters for intrinsic camera matrix
+# ---------------------------------------------------
+fx = 570.3
+fy = 570.3
+cx = 320
+cy = 240
 # ---------------------------------------------------
 #   Load file (for starters is only for testing - might be included in the loop to change over time)
 # ---------------------------------------------------
@@ -27,15 +35,40 @@ pcd_ds = transform(pcd_ds, tx, ty, tz, roll, pitch, yaw)
 # ---------------------------------------------------
 #   Get objects positions and bounding boxes
 # ---------------------------------------------------
-teste = object_isolation(pcd_ds, xmin, xmax, ymin, ymax, zmin, zmax)
+isolated_objects = object_isolation(pcd_ds, xmin, xmax, ymin, ymax, zmin, zmax)
+
 entities = []
-for t in teste:
-    entities.append(t['bbox'])
+object_cloud_list = []
+object_array_list = []
+for object in isolated_objects:
+    bbox = object['bbox']
+    entities.append(bbox)
+    object_cloud = original_pcd.crop(bbox)
+    ptc_pointsX, ptc_pointsY, ptc_pointsZ, ptc_colorsR, ptc_colorsG, ptc_colorsB = cloud2array(object_cloud)
+    object_cloud_list.append(object_cloud)
 
-pcl = np.concatenate((entities, [original_pcd]))
+# ---------------------------------------------------
+#   Objects classification
+# ---------------------------------------------------
+intrinsic = np.zeros((3,3))
+intrinsic[0,0] = fx
+intrinsic[1,1] = fy
+intrinsic[0,2] = cx
+intrinsic[1,2] = cy
+intrinsic[2,2] = 1
+teste = projectPoints(object_cloud_list[1], intrinsic, tx, ty, tz, roll, pitch, yaw)
 
-# exit()
+
+exit()
 # Visualization for testing
+
+
+    # object_array_list.append(object_array)
+    
+# pcl = np.concatenate((entities, [original_pcd]))
+pcl = [object_cloud_list[0]]
+print(object_array_list[0])
+exit()
 view = {
 	"class_name" : "ViewTrajectory",
 	"interval" : 29,

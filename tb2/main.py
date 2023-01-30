@@ -64,7 +64,7 @@ def main():
 
     # Calculation of the reference transformation parameters for the center of the table - In this case only for TRANS
     tx, ty, tz = p.frameadjustment()        
-  
+    # print(f"tx={tx}, ty={ty}, tz={tz}")
     # Frame Transform CAM to TABLE
     p.frametransform(0, 0, 0, tx, ty, tz)
     p.frametransform(-108, 0, 0, 0, 0, 0)
