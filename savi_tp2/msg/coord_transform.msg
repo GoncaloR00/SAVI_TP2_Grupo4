@@ -1,0 +1,12 @@
+float32 tx
+float32 ty
+float32 tz
+float32 rx
+float32 ry
+float32 rz
+float32 xmin
+float32 xmax
+float32 ymin
+float32 ymax
+float32 zmin
+float32 zmax

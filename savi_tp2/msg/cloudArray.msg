@@ -1,3 +1,5 @@
+std_msgs/Header header
+    time stamp
 float64[] pointsX
 float64[] pointsY
 float64[] pointsZ

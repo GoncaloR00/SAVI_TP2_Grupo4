@@ -17,9 +17,9 @@ original_pcd = o3d.io.read_point_cloud(filename)
 #   Topics to publish
 # ---------------------------------------------------
 topic_ptc = '/tp2_savi/clouds/ptc'
-pub_ptc = rospy.Publisher(topic_ptc, cloudArray, queue_size=1)
+pub_ptc = rospy.Publisher(topic_ptc, cloudArray, queue_size=10)
 topic_ptcDS = '/tp2_savi/clouds/ptcDS'
-pub_ptcDS = rospy.Publisher(topic_ptcDS, cloudArray, queue_size=1)
+pub_ptcDS = rospy.Publisher(topic_ptcDS, cloudArray, queue_size=10)
 frame_rate = 20
 
 # ---------------------------------------------------
@@ -57,7 +57,6 @@ def talker():
     while not rospy.is_shutdown():
         pub_ptc.publish(ptc_msg)
         pub_ptcDS.publish(ptcDS_msg)
-        rate.sleep()
 
 if __name__ == '__main__':
     try:
