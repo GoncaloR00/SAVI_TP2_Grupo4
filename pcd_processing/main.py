@@ -152,13 +152,13 @@ def main():
     def generate_audio(objects_properties):
         message = ""
         for obj in objects_properties:
-            message += "O objeto " + str(obj['idx']) + " tem uma área de " + str(round(obj['area'] * 10000, 0)) + " cm2 e um volume de " + str(round(obj['volume'] * 100000, 0)) + " cm3. "
+            message += "O objeto " + str(obj['idx']) + " tem uma área de " + str(round(obj['area'] * 10000, 0)) + " centrímetros quadrados e um volume de " + str(round(obj['volume'] * 100000, 0)) + " centrímetros cúbicos. "
 
         language = 'pt'
         myobj = gTTS(text=message, lang=language, slow=False)
-        myobj.save("objetos.mp3")
+        myobj.save("Speak_Objetos.mp3")
 
-        os.system("start objetos.mp3")
+        #os.system("start objetos.mp3")
     
     #table of info of objects
     #x = PrettyTable() #table default
