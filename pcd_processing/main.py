@@ -186,16 +186,6 @@ def main():
 #
     #engine.runAndWait()
 
-    #outra via
-    #vai criar umn fichiero mp3 com o texto
-    #for obj in p.objects_properties:
-    #    message = "O objeto " + str(obj['idx']) + " tem uma área de " + str(round(obj['area'] * 10000, 0)) + " cm2 e um volume de " + str(round(obj['volume'] * 100000, 0)) + " cm3."
-#
-    #language = 'pt'
-    #myobj = gTTS(text=message, lang=language, slow=False)
-    #myobj.save('O que existe na cena.mp3')
-#
-    #os.system("O que existe na cena.mp3")
     
 
 
