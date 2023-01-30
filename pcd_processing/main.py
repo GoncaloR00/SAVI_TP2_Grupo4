@@ -7,6 +7,7 @@ import copy
 import numpy as np
 import open3d as o3d
 from prettytable import PrettyTable
+from prettytable.colortable import ColorTable, Themes
 from pcd_proc import PointCloudProcessing
 import open3d.visualization.gui as gui
 import open3d.visualization.rendering as rendering
@@ -99,18 +100,18 @@ def main():
 
 
     # Draw table plane + frame + objects
-    entities = np.concatenate((entities, p.objects_to_draw))
-
-    o3d.visualization.draw_geometries(entities,
-                                             zoom = view['trajectory'][0]['zoom'],
-                                             front = view['trajectory'][0]['front'],
-                                             lookat = view['trajectory'][0]['lookat'],
-                                             up = view['trajectory'][0]['up'])
-    o3d.visualization.draw_geometries(p.objects_to_draw,
-                                             zoom = view['trajectory'][0]['zoom'],
-                                             front = view['trajectory'][0]['front'],
-                                             lookat = view['trajectory'][0]['lookat'],
-                                             up = view['trajectory'][0]['up'])
+    #entities = np.concatenate((entities, p.objects_to_draw))
+#
+    #o3d.visualization.draw_geometries(entities,
+    #                                         zoom = view['trajectory'][0]['zoom'],
+    #                                         front = view['trajectory'][0]['front'],
+    #                                         lookat = view['trajectory'][0]['lookat'],
+    #                                         up = view['trajectory'][0]['up'])
+    #o3d.visualization.draw_geometries(p.objects_to_draw,
+    #                                         zoom = view['trajectory'][0]['zoom'],
+    #                                         front = view['trajectory'][0]['front'],
+    #                                         lookat = view['trajectory'][0]['lookat'],
+    #                                         up = view['trajectory'][0]['up'])
 
     #make a more complex window to show 3d objects labels
 
@@ -135,9 +136,9 @@ def main():
             #l2 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.06)), 'Volume: ( ' + str(round(obj['x_width']*1000,0)) + 
             #                           ' x ' + str(round(obj['y_width']*1000,0)) + ' x ' + str(round(obj['height']*1000,0)) + ') mm' )
             #area em mm2
-            l3 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.04)), 'Area: (' + str(round(obj['area']*10000,0)) + ') cm2')
+            l3 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.06)), 'Area: (' + str(round(obj['area']* 10000, 0)) + ') cm2')
             #volume em mm3
-            l2 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.06)), 'Volume: (' + str(round(obj['volume']*100000,0)) + ') cm3')
+            l2 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.04)), 'Volume: (' + str(round(obj['volume']*1000000,0)) + ') cm3')
             #cor label
             l.color = gui.Color(obj['color'][0], obj['color'][1], obj['color'][2],)
 
@@ -147,7 +148,8 @@ def main():
     app.run()
 
     #table of info of objects
-    x = PrettyTable()
+    #x = PrettyTable() #table default
+    x = ColorTable(theme=Themes.OCEAN) #table with colors
 
     x.field_names = ["Objeto", "Area (cm2)", 'Volume (cm3)']
     x.align = "r"
@@ -158,8 +160,6 @@ def main():
     print('')
     print('Tabela de informações dos objetos:')
     print(x)
-
-
 
 
 

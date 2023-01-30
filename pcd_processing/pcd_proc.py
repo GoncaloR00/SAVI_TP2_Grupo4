@@ -229,7 +229,8 @@ class PointCloudProcessing():
             d['color'] = colormap[object_idx, 0:3]
             d['center'] = object_center
 
-            print('center of object' + str(object_idx) + ': ' + str(object_center))
+            #caso queira ver o centro de cada objeto
+            #print('center of object' + str(object_idx) + ': ' + str(object_center))
             
             
 
