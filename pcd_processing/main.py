@@ -135,9 +135,9 @@ def main():
             #l2 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.06)), 'Volume: ( ' + str(round(obj['x_width']*1000,0)) + 
             #                           ' x ' + str(round(obj['y_width']*1000,0)) + ' x ' + str(round(obj['height']*1000,0)) + ') mm' )
             #area em mm2
-            l3 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.04)), 'Area: (' + str(round(obj['area']*1000,0)) + ') m2')
+            l3 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.04)), 'Area: (' + str(round(obj['area']*10000,0)) + ') cm2')
             #volume em mm3
-            l2 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.06)), 'Volume: (' + str(round(obj['volume']*1000,0)) + ') m3')
+            l2 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.06)), 'Volume: (' + str(round(obj['volume']*100000,0)) + ') cm3')
             #cor label
             l.color = gui.Color(obj['color'][0], obj['color'][1], obj['color'][2],)
 
