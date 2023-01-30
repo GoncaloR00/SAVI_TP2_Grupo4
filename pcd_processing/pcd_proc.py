@@ -255,6 +255,10 @@ class PointCloudProcessing():
             d['y_width'] = y_width
             d['height'] = z_height
 
+            #area and volume bbox objetos
+            d['area'] = x_width * y_width
+            d['volume'] = x_width * y_width * z_height
+                
             # BBOX
             np_points = np.ndarray((8,3), dtype=float)
             np_points[0, :] = [min(x_coordinates), min(y_coordinates), min(z_coordinates)]

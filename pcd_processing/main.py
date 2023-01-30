@@ -7,7 +7,8 @@ import copy
 import numpy as np
 import open3d as o3d
 from pcd_proc import PointCloudProcessing
-import pcd_proc as gui
+import open3d.visualization.gui as gui
+import open3d.visualization.rendering as rendering
 
 
 
@@ -42,7 +43,7 @@ def main():
     
     # Load PCD
     p = PointCloudProcessing()
-    p.loadPointCloud('/home/andre/catkin_ws/src/SAVI_TP2_Grupo4/tb2/pcds/07.ply')   
+    p.loadPointCloud('/home/andre/catkin_ws/src/SAVI_TP2_Grupo4/pcd_processing/pcds/07.ply')   
     
 
     
@@ -109,6 +110,42 @@ def main():
                                              front = view['trajectory'][0]['front'],
                                              lookat = view['trajectory'][0]['lookat'],
                                              up = view['trajectory'][0]['up'])
+
+    #make a more complex window to show 3d objects labels
+
+    app = gui.Application.instance
+    app.initialize() # create a open3d app
+
+    w = app.create_window("Detected Objects", 1980, 1080)
+    widget3d = gui.SceneWidget()
+    widget3d.scene = rendering.Open3DScene(w.renderer)
+    #widget3d.scene.set_background([1,1,1,1])
+    material = rendering.Material() #rendering.materialrecord (outras versoes de open3d)
+    material.shader = "defaultUnlit"
+    material.point_size = 3 * w.scaling
+
+    
+
+    for entity_idx, entity in enumerate(p.objects_to_draw):
+        widget3d.scene.add_geometry("Entity" + str(entity_idx),entity, material)
+        for obj in p.objects_properties:
+            l = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.09)), 'Object: ' + str(obj['idx']))
+            #volume em (x x y x z) mm
+            #l2 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.06)), 'Volume: ( ' + str(round(obj['x_width']*1000,0)) + 
+            #                           ' x ' + str(round(obj['y_width']*1000,0)) + ' x ' + str(round(obj['height']*1000,0)) + ') mm' )
+            #area em mm2
+            l3 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.04)), 'Area: (' + str(round(obj['area']*1000,0)) + ') m2')
+            #volume em mm3
+            l2 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.06)), 'Volume: (' + str(round(obj['volume']*1000,0)) + ') m3')
+            #cor label
+            l.color = gui.Color(obj['color'][0], obj['color'][1], obj['color'][2],)
+
+    bbox = widget3d.scene.bounding_box
+    widget3d.setup_camera(60.0, bbox, bbox.get_center())
+    w.add_child(widget3d)
+    app.run()
+
+
 
 
     
