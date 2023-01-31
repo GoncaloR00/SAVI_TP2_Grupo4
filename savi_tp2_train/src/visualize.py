@@ -8,6 +8,16 @@ from torchvision import transforms
 from typing import Tuple, Dict, List
 import torchvision
 from TinyVGG import TinyVGG
+import argparse
+
+parser = argparse.ArgumentParser(
+                    prog = 'visualize',
+                    description = 'This program is useful to see the results of the training trains a deep learning model to do the classification task in the compute_cloud program',
+                    epilog = '-cl <cloud name>')
+parser.add_argument('-n',dest='epoch', type=int)
+parser.add_argument('-lr',dest='lrrate', type=bool)
+args = parser.parse_args()
+
 
 MODEL_PATH = pathlib.Path("./models")
 

@@ -43,7 +43,7 @@ def main(cloud_name):
 	#   RosTopic to publish
 	# ---------------------------------------------------
 	topic_images = '/tp2_savi/images'
-	pub_image = rospy.Publisher(topic_images, images, queue_size=5)
+	pub_image = rospy.Publisher(topic_images, images, queue_size=10)
 	# Classification
 	train_dir = pathlib.Path('../../../rgbd-dataset-train/')
 	MODEL_PATH = pathlib.Path("./models")
@@ -59,7 +59,8 @@ def main(cloud_name):
 	# ---------------------------------------------------
 	#   Create messages
 	# ---------------------------------------------------
-	ptc_msg = cloudArray()
+	# ptc_msg = cloudArray()
+	image_msg = images()
 	# ---------------------------------------------------
 	#   Downscale cloud
 	# ---------------------------------------------------
@@ -108,7 +109,8 @@ def main(cloud_name):
 	transformed_images = []
 	for image in image_list:
 		transformed_images.append(bridge.cv2_to_imgmsg(image, "passthrough"))
-	# message.images = transformed_images
+	image_msg.images = transformed_images
+	pub_image.publish(image_msg)
 
 	pcl = np.concatenate((entities, [original_pcd]))
 	
@@ -124,19 +126,19 @@ def main(cloud_name):
 	for entity_idx, entity in enumerate(pcl):
 		widget3d.scene.add_geometry("Entity" + str(entity_idx),entity, material)
 		for obj_idx, obj in enumerate(isolated_objects):
-			l = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.11)), 'Object ' + str(obj['idx']) + ':'+ str(classification_list[obj_idx]))
+			l = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.11)), 'Object ' + str(obj['idx']) + ': '+ str(classification_list[obj_idx]))
 			l3 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.08)), 'Area: (' + str(round(obj['area']* 10000, 0)) + ') cm2')
 			#volume em mm3
 			l2 = widget3d.add_3d_label(obj['center']+(-0.1,0,((obj['height']/2)+0.05)), 'Volume: (' + str(round(obj['volume']*1000000,0)) + ') cm3')
 			#cor label
-			l.color = gui.Color(obj['color'][0], obj['color'][1], obj['color'][2],)
-			l3.color = gui.Color(0, 1, 1,)
-			l2.color = gui.Color(0, 1, 1,)
+			l.color = gui.Color(1,0,0,)
+			l3.color = gui.Color(1, 0.5, 0,)
+			l2.color = gui.Color(1, 0.5, 0,)
 
 	bbox = widget3d.scene.bounding_box
 	widget3d.setup_camera(60.0, bbox, bbox.get_center())
 	w.add_child(widget3d)
 	app.run()
 if __name__ == "__main__":
-	# rospy.init_node('compute_cloud')
+	rospy.init_node('compute_cloud')
 	main(cloud_name)

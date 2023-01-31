@@ -12,12 +12,22 @@ from typing import Tuple, Dict, List
 from timeit import default_timer as timer
 from tqdm.auto import tqdm
 from TinyVGG import TinyVGG
+import argparse
+
+parser = argparse.ArgumentParser(
+                    prog = 'train_model',
+                    description = 'This program trains a deep learning model to do the classification task in the compute_cloud program',
+                    epilog = '-cl <cloud name>')
+parser.add_argument('-n',dest='epoch', type=int)
+parser.add_argument('-lr',dest='lrrate', type=float)
+args = parser.parse_args()
 
 # Set number of epochs
-NUM_EPOCHS = 500
+n_epoch = args.epoch
+NUM_EPOCHS = n_epoch
 
 # Set learning rate
-LR_RATE = 0.001
+LR_RATE = args.lrrate
 
 BATCH_SIZE = 256
 NUM_WORKERS = os.cpu_count()
@@ -32,15 +42,15 @@ MODEL_PATH.mkdir(parents=True, # create parent directories if needed
 )
 
 # Create model save path
-MODEL_RESULTS_NAME = "SAVI_modelResults500.pth"
+MODEL_RESULTS_NAME = "SAVI_modelResults" + str(n_epoch) + ".pth"
 MODEL_RESULTS_SAVE_PATH = MODEL_PATH / MODEL_RESULTS_NAME
 
 # Create model save path
-MODEL_DICT_NAME = "SAVI_modelDict500.pth"
+MODEL_DICT_NAME = "SAVI_modelDict" + str(n_epoch) + ".pth"
 MODEL_DICT_SAVE_PATH = MODEL_PATH / MODEL_DICT_NAME
 
 # Create model save path
-MODEL_COMP_NAME = "SAVI_modelComp500.pth"
+MODEL_COMP_NAME = "SAVI_modelComp" + str(n_epoch) + ".pth"
 MODEL_COMP_SAVE_PATH = MODEL_PATH / MODEL_COMP_NAME
 
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu' # cuda: 0 index of gpu
