@@ -156,9 +156,9 @@ def main():
 
         language = 'pt'
         myobj = gTTS(text=message, lang=language, slow=False)
-        myobj.save("Speak_Objetos.mp3")
+        myobj.save("Speak_objetos.mp3")
 
-        #os.system("start objetos.mp3")
+        #os.system("Speak_objetos.mp3")
     
     #table of info of objects
     #x = PrettyTable() #table default
