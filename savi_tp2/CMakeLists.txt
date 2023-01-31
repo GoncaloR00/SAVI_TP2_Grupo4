@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  sensor_msgs
+  geometry_msgs
   message_generation
 )
 
@@ -52,6 +54,8 @@ add_message_files(
   FILES
   cloudArray.msg
   coord_transform.msg
+  images.msg
+  bboxes.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -72,6 +76,8 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  sensor_msgs
+  geometry_msgs
 )
 
 ################################################
@@ -104,7 +110,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
+  CATKIN_DEPENDS roscpp rospy std_msgs sensor_msgs geometry_msgs message_runtime
 #  INCLUDE_DIRS include
 #  LIBRARIES savi_tp2
 #  CATKIN_DEPENDS roscpp rospy std_msgs

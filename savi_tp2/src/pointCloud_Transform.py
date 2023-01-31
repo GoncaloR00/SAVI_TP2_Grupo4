@@ -12,6 +12,11 @@ def cloud2array(cloud):
     ptc_colorsB = ptc_colors[:,2]
     return ptc_pointsX, ptc_pointsY, ptc_pointsZ, ptc_colorsR, ptc_colorsG, ptc_colorsB
 
+def cloud2BIGarray(cloud):
+    ptc_points = np.asarray(cloud.points)
+    ptc_colors = np.asarray(cloud.colors)
+    return ptc_points, ptc_colors
+
 def array2cloud(ptc_pointsX, ptc_pointsY, ptc_pointsZ, ptc_colorsR, ptc_colorsG, ptc_colorsB):
     size = np.asarray(ptc_pointsX).size
     points = np.zeros((size,3))
@@ -25,4 +30,10 @@ def array2cloud(ptc_pointsX, ptc_pointsY, ptc_pointsZ, ptc_colorsR, ptc_colorsG,
     cloud = o3d.geometry.PointCloud()
     cloud.points = o3d.utility.Vector3dVector(points)
     cloud.colors = o3d.utility.Vector3dVector(colors)
+    return cloud
+
+def BIGarray2cloud(ptc_points, ptc_colors):
+    cloud = o3d.geometry.PointCloud()
+    cloud.points = o3d.utility.Vector3dVector(ptc_points)
+    cloud.colors = o3d.utility.Vector3dVector(ptc_colors)
     return cloud

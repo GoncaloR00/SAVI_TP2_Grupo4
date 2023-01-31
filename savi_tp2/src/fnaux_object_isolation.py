@@ -80,6 +80,11 @@ def cluster_objects(objects_cloud):
         d['y_width'] = y_width
         d['height'] = z_height
 
+        d['area'] = x_width * y_width
+        d['volume'] = x_width * y_width * z_height
+        # print(min(x_coordinates))
+        boundaries = (min(x_coordinates), min(y_coordinates), min(z_coordinates), max(x_coordinates), max(y_coordinates), max(z_coordinates))
+        d['boundaries'] = boundaries
         # BBOX 
         np_points = np.ndarray((8,3), dtype=float)
         np_points[0, :] = [min(x_coordinates), min(y_coordinates), min(z_coordinates)]

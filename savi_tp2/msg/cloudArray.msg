@@ -1,8 +1,6 @@
-std_msgs/Header header
-    time stamp
-float64[] pointsX
-float64[] pointsY
-float64[] pointsZ
-float64[] colorsR
-float64[] colorsG
-float64[] colorsB
+float32[] pointsX
+float32[] pointsY
+float32[] pointsZ
+float32[] colorsR
+float32[] colorsG
+float32[] colorsB
