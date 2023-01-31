@@ -187,7 +187,11 @@ def main():
 #
     #engine.runAndWait()
 
+    #-------------------------------------------------
     #plot de imagens objetos
+    #-------------------------------------------------
+
+    
     # Defina o número de subplots
     n_rows, n_cols = 5, 5
     
