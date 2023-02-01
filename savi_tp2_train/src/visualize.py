@@ -9,25 +9,29 @@ from typing import Tuple, Dict, List
 import torchvision
 from TinyVGG import TinyVGG
 import argparse
+import random
+import dircache
 
 parser = argparse.ArgumentParser(
                     prog = 'visualize',
                     description = 'This program is useful to see the results of the training trains a deep learning model to do the classification task in the compute_cloud program',
                     epilog = '-cl <cloud name>')
 parser.add_argument('-n',dest='epoch', type=int)
-parser.add_argument('-lr',dest='lrrate', type=bool)
+parser.add_argument('-infer',dest='inference', action="store_true")
 args = parser.parse_args()
 
+n_epoch = args.epoch
+infer = args.inference
 
 MODEL_PATH = pathlib.Path("./models")
 
-MODEL_RESULTS_NAME = "SAVI_modelResults500.pth"
+MODEL_RESULTS_NAME = "SAVI_modelResults" + str(n_epoch) + ".pth"
 MODEL_RESULTS_SAVE_PATH = MODEL_PATH / MODEL_RESULTS_NAME
 
-MODEL_DICT_NAME = "SAVI_modelDict500.pth"
+MODEL_DICT_NAME = "SAVI_modelDict" + str(n_epoch) + ".pth"
 MODEL_DICT_SAVE_PATH = MODEL_PATH / MODEL_DICT_NAME
 
-MODEL_COMP_NAME = "SAVI_modelComp500.pth"
+MODEL_COMP_NAME = "SAVI_modelComp" + str(n_epoch) + ".pth"
 MODEL_COMP_SAVE_PATH = MODEL_PATH / MODEL_COMP_NAME
 
 train_dir = pathlib.Path('../../../rgbd-dataset-train/')
@@ -118,42 +122,62 @@ def make_prediction(model, transformed_image):
         custom_image_pred = model(transformed_image.to(device))
     return custom_image_pred
 
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def plot_images():
+    # Defina o número de subplots
+    n_rows, n_cols = 3, 3
+    # Crie uma figura e adicione subplots
+    fig, axs = plt.subplots(n_rows, n_cols, figsize=(10, 7)) # figsize=(width, height)
+
+    counter = 00
+    # Itera sobre cada subplot e adiciona uma imagem com título e legenda
+    for i in range(n_rows):
+        for j in range(n_cols):
+            axs[i, j].imshow(np.random.rand(10,10)) # Adiciona uma imagem aleatória
+            axs[i, j].set_title(f"Objeto {counter:02d}", pad = -10) # pad = -10 para não sobrescrever o título
+            axs[i, j].axis("off") # Desativa os eixos
+            #axs[i, j].set_xlabel("Eixo X")
+            #axs[i, j].set_ylabel("Eixo Y")
+            counter += 1 # Incrementa o contador
+
+    # Mostre a figura
+    fig.suptitle("Objetos em cena") # Título da figura
+    plt.show()
+
 def main():
-    class_names = find_classes(train_dir)[0]
-    train_len = len(next(os.walk(train_dir))[1])
-    model_1_results = torch.load(f=MODEL_RESULTS_SAVE_PATH)
-    plot_loss_curves(model_1_results)
-    model_1 = TinyVGG(
-            input_shape=3,
-            hidden_units=10,
-            output_shape=train_len)
+    if infer:
+        class_names = find_classes(train_dir)[0]
+        random_class_list = []
+        for i in range(9):
+            random_class_list.append(random.choice(class_names))
+        
+        train_len = len(next(os.walk(train_dir))[1])
+        model_1 = TinyVGG(
+                input_shape=3,
+                hidden_units=10,
+                output_shape=train_len)
 
-    model_1_dict = torch.load(f=MODEL_DICT_SAVE_PATH)
-    model_1.load_state_dict(model_1_dict)
-    model_1.eval()
-    custom_image_path = pathlib.Path('../../../rgbd-dataset-train/') / "banana" / "banana_1_1_1_crop.png"
-    custom_image = torchvision.io.read_image(str(custom_image_path)).type(torch.float32)
-    custom_image = custom_image / 255.
-    custom_image_transformed = transform_image(custom_image)
+        model_1_dict = torch.load(f=MODEL_DICT_SAVE_PATH)
+        model_1.load_state_dict(model_1_dict)
+        model_1.eval()
+        custom_image_path = pathlib.Path('../../../rgbd-dataset-train/') / "banana" / "banana_1_1_1_crop.png"
+        custom_image = torchvision.io.read_image(str(custom_image_path)).type(torch.float32)
+        custom_image = custom_image / 255.
+        custom_image_transformed = transform_image(custom_image)
 
+        with torch.inference_mode():
+                custom_image_pred = model_1(custom_image_transformed)
 
-    # exit()
-    with torch.inference_mode():
-            custom_image_pred = model_1(custom_image_transformed)
-    # exit()
+        custom_image_pred_probs = torch.softmax(custom_image_pred, dim=1)
+        custom_image_pred_label = torch.argmax(custom_image_pred_probs, dim=1)
+        custom_image_pred_class = class_names[custom_image_pred_label.cpu()]
 
-    custom_image_pred_probs = torch.softmax(custom_image_pred, dim=1)
-    custom_image_pred_label = torch.argmax(custom_image_pred_probs, dim=1)
-    custom_image_pred_class = class_names[custom_image_pred_label.cpu()]
-
-    print(custom_image_pred_class)
-    # # Teste
-    # teste = torch.load(f=MODEL_SAVE_PATH)
-    # model_1.load_state_dict(teste)
-    #     test_loss, test_acc = test_step(model=model_1,
-    #         dataloader=test_dataloader_simple,
-    #         loss_fn=loss_fn)
-    # print(f"loss:{test_loss}/nAcc:{test_acc}")
-    # exit()
+        print(custom_image_pred_class)
+    else:
+        model_1_results = torch.load(f=MODEL_RESULTS_SAVE_PATH)
+        plot_loss_curves(model_1_results)
 
 main()

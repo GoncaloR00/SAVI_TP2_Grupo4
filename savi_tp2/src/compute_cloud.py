@@ -108,7 +108,7 @@ def main(cloud_name):
 	bridge = CvBridge()
 	transformed_images = []
 	for image in image_list:
-		transformed_images.append(bridge.cv2_to_imgmsg(image, "passthrough"))
+		transformed_images.append(bridge.cv2_to_imgmsg(image, "rgb8"))
 	image_msg.images = transformed_images
 	pub_image.publish(image_msg)
 

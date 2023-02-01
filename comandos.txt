@@ -1,5 +1,0 @@
-Organizar os dados
-No diretório do ficheiro "organize_data.py" (./savi_tp2_train/src) executar o comando ./organize_data.py
-
-
-./train.py -n <number of epochs> -lr <learning rate>

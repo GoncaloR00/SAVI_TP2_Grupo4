@@ -309,4 +309,3 @@ def main():
            f=MODEL_COMP_SAVE_PATH)
 
 main()
-# print(find_classes(train_dir))
