@@ -14,6 +14,7 @@ import numpy as np
 import cv2
 from cv_bridge import CvBridge
 import argparse
+from std_msgs.msg import String
 
 parser = argparse.ArgumentParser(
                     prog = 'compute_cloud',
@@ -103,8 +104,9 @@ def main(cloud_name):
 		image_list, classification_list = object_classificationMODE(object_cloud_list, intrinsic, tx, ty, tz, roll, pitch, yaw, train_dir, MODEL_DICT_SAVE_PATH,original_image)
 	else:
 		image_list, classification_list = object_classification(object_cloud_list, intrinsic, tx, ty, tz, roll, pitch, yaw, train_dir, MODEL_DICT_SAVE_PATH)
-	print(classification_list)
-	# Images
+	print(classification_list[0])
+	for i in range(len(classification_list)):
+		image_msg.classes.append(String(classification_list[i-1]))
 	bridge = CvBridge()
 	transformed_images = []
 	for image in image_list:

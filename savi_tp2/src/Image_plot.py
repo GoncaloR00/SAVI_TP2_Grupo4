@@ -2,6 +2,7 @@
 import rospy
 from savi_tp2.msg import images
 from cv_bridge import CvBridge
+from std_msgs.msg import String
 
 # Para demonstrar
 import cv2
@@ -19,7 +20,7 @@ def callback(message):
         images_list.append(bridge.imgmsg_to_cv2(image, "rgb8"))
     if len(images_list) > 0:
         for idx, image in enumerate(images_list):
-            cv2.imshow('Imagem ' + str(idx), image)
+            cv2.imshow('Imagem ' + str(idx) + ': '+ message.classes[idx].data, image)
         cv2.waitKey(0)
 
 
