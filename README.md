@@ -204,8 +204,3 @@ João Cruz -
 Professor Miguel Oliveira - mriem@ua.pt
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
