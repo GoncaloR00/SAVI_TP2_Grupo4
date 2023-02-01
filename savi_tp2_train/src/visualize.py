@@ -10,7 +10,8 @@ import torchvision
 from TinyVGG import TinyVGG
 import argparse
 import random
-import dircache
+import numpy as np
+import matplotlib.image as mpimg
 
 parser = argparse.ArgumentParser(
                     prog = 'visualize',
@@ -122,11 +123,8 @@ def make_prediction(model, transformed_image):
         custom_image_pred = model(transformed_image.to(device))
     return custom_image_pred
 
-import matplotlib.pyplot as plt
-import numpy as np
 
-
-def plot_images():
+def plot_images(image_list, class_pred_list, success_list):
     # Defina o número de subplots
     n_rows, n_cols = 3, 3
     # Crie uma figura e adicione subplots
@@ -136,8 +134,12 @@ def plot_images():
     # Itera sobre cada subplot e adiciona uma imagem com título e legenda
     for i in range(n_rows):
         for j in range(n_cols):
-            axs[i, j].imshow(np.random.rand(10,10)) # Adiciona uma imagem aleatória
-            axs[i, j].set_title(f"Objeto {counter:02d}", pad = -10) # pad = -10 para não sobrescrever o título
+            if success_list[counter]:
+                color = 'green'
+            else:
+                color = 'red'
+            axs[i, j].imshow(image_list[counter]) # Adiciona uma imagem aleatória
+            axs[i, j].set_title(f"{class_pred_list[counter]}", pad = -10,color= color) # pad = -10 para não sobrescrever o título
             axs[i, j].axis("off") # Desativa os eixos
             #axs[i, j].set_xlabel("Eixo X")
             #axs[i, j].set_ylabel("Eixo Y")
@@ -150,32 +152,39 @@ def plot_images():
 def main():
     if infer:
         class_names = find_classes(train_dir)[0]
-        random_class_list = []
+        pred_list = []
+        image_list = []
+        success_list = []
+
         for i in range(9):
-            random_class_list.append(random.choice(class_names))
-        
-        train_len = len(next(os.walk(train_dir))[1])
-        model_1 = TinyVGG(
-                input_shape=3,
-                hidden_units=10,
-                output_shape=train_len)
-
-        model_1_dict = torch.load(f=MODEL_DICT_SAVE_PATH)
-        model_1.load_state_dict(model_1_dict)
-        model_1.eval()
-        custom_image_path = pathlib.Path('../../../rgbd-dataset-train/') / "banana" / "banana_1_1_1_crop.png"
-        custom_image = torchvision.io.read_image(str(custom_image_path)).type(torch.float32)
-        custom_image = custom_image / 255.
-        custom_image_transformed = transform_image(custom_image)
-
-        with torch.inference_mode():
+            real_class = random.choice(class_names)
+            images_path = pathlib.Path('../../../rgbd-dataset-all/') / real_class
+            filename = random.choice(os.listdir(str(images_path)))
+            custom_image_path = images_path / filename
+            custom_image = torchvision.io.read_image(str(custom_image_path)).type(torch.float32)
+            custom_image = custom_image / 255.
+            custom_image_transformed = transform_image(custom_image)
+            train_len = len(next(os.walk(train_dir))[1])
+            model_1 = TinyVGG(
+                    input_shape=3,
+                    hidden_units=10,
+                    output_shape=train_len)
+            model_1_dict = torch.load(f=MODEL_DICT_SAVE_PATH)
+            model_1.load_state_dict(model_1_dict)
+            model_1.eval()
+            with torch.inference_mode():
                 custom_image_pred = model_1(custom_image_transformed)
-
-        custom_image_pred_probs = torch.softmax(custom_image_pred, dim=1)
-        custom_image_pred_label = torch.argmax(custom_image_pred_probs, dim=1)
-        custom_image_pred_class = class_names[custom_image_pred_label.cpu()]
-
-        print(custom_image_pred_class)
+            custom_image_pred_probs = torch.softmax(custom_image_pred, dim=1)
+            custom_image_pred_label = torch.argmax(custom_image_pred_probs, dim=1)
+            custom_image_pred_class = class_names[custom_image_pred_label.cpu()]
+            if custom_image_pred_class == real_class:
+                success = True
+            else:
+                success = False
+            pred_list.append(custom_image_pred_class)
+            success_list.append(success)
+            image_list.append(mpimg.imread(str(custom_image_path)))
+        plot_images(image_list, pred_list, success_list)
     else:
         model_1_results = torch.load(f=MODEL_RESULTS_SAVE_PATH)
         plot_loss_curves(model_1_results)
