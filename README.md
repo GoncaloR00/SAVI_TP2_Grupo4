@@ -137,10 +137,12 @@ If you want to see the loss and accuracy curves:
 ```
 ./visualize.py -n <number of epochs>
 ```
+![alt text](./images/Figure_1.png)
 If you want to see an inference example on random images from the dataset:
 ```
 ./visualize.py -n <number of epochs> -infer
 ```
+![alt text](./images/Objetos_em_cena.png)
 The right names will be green and the wrong ones will be red
 ***
 ### Get the object positions and classification
@@ -171,6 +173,11 @@ cd ./savi_tp2/src
 ```
 ./compute_cloud.py -cl <cloud filename>
 ```
+Caso a imagem original contenha a mesa, o classificador vai buscar a imagem original
+![alt text](./images/Screenshot%20from%202023-02-01%2010-20-42.png)
+Caso não haja, o classificador faz a projeção dos pontos para uma imagem 2D
+
+![alt text](./images/Screenshot%20from%202023-02-01%2010-19-16.png)
 ***
 
 ## References

@@ -29,7 +29,7 @@ def main(cloud_name):
 	# cloud_name = '01.pcd'
 	cloud_name_number = cloud_name.split('.')[0]
 	cloud_number = int(cloud_name_number)
-	if (cloud_number >= 5 and cloud_number <= 8) or cloud_number == 13:
+	if (cloud_number >= 5 and cloud_number <= 8) or cloud_number == 13 or cloud_number == 14:
 		mode = False
 	else:
 		mode = True

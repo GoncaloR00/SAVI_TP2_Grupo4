@@ -8,6 +8,7 @@ import pathlib
 import torchvision
 from torchvision import transforms
 from TinyVGG import TinyVGG
+import random
 
 def projectPoints(cloud, intrinsic, tx, ty, tz, roll, pitch, yaw):
     # new_cloud = undoTransform(cloud, tx, ty, tz, roll, pitch, yaw)
@@ -43,6 +44,13 @@ def projectPointsMODE(cloud, intrinsic, tx, ty, tz, roll, pitch, yaw, original_i
     px_min = min(px)
     py_min = min(py)
     image = original_image[py_min:py_max, px_min:px_max]
+    # Teste ao classificador
+    # real_class = 'banana'
+    # images_path = pathlib.Path('../../../rgbd-dataset-all/') / real_class
+    # filename = random.choice(os.listdir(str(images_path)))
+    # custom_image_path = images_path / filename
+    # image = cv2.imread(str(custom_image_path))
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     return image
 
 def find_classes(directory: str) -> Tuple[List[str], Dict[str, int]]:

@@ -146,7 +146,7 @@ def plot_images(image_list, class_pred_list, success_list):
             counter += 1 # Incrementa o contador
 
     # Mostre a figura
-    fig.suptitle("Objetos em cena") # Título da figura
+    fig.canvas.set_window_title("Objetos em cena")
     plt.show()
 
 def main():

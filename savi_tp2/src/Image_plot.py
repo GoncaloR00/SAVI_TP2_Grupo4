@@ -20,7 +20,7 @@ def callback(message):
         size = int(math.sqrt(len(images_list)) + (0 if math.sqrt(len(images_list))% 1 == 0 else 1))
         fig, axs = plt.subplots(size, size)
         fig.tight_layout()
-        fig.suptitle('Images and their Labels')
+        fig.canvas.set_window_title('Images and their Labels')
         for i in range(size):
             for j in range(size):
                 if (i*size + j) < len(images_list):
