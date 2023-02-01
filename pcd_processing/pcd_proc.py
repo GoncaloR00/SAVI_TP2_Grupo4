@@ -296,4 +296,25 @@ class PointCloudProcessing():
             self.objects_to_draw.append(object['points'])
             self.objects_to_draw.append(object['bbox'])
 
+    #def plot_images():
+    ## Defina o número de subplots
+    #    n_rows, n_cols = 5, 5
+    #    
+    #    # Crie uma figura e adicione subplots
+    #    fig, axs = plt.subplots(n_rows, n_cols, figsize=(10, 7)) # figsize=(width, height)
+    #    
+    #    counter = 00
+    #    # Itera sobre cada subplot e adiciona uma imagem com título e legenda
+    #    for i in range(n_rows):
+    #        for j in range(n_cols):
+    #            axs[i, j].imshow(np.random.rand(10,10)) # Adiciona uma imagem aleatória
+    #            axs[i, j].set_title(f"Objeto {counter:02d}", pad = -10) # pad = -10 para não sobrescrever o título
+    #            axs[i, j].axis("off") # Desativa os eixos
+    #            #axs[i, j].set_xlabel("Eixo X")
+    #            #axs[i, j].set_ylabel("Eixo Y")
+    #            counter += 1 # Incrementa o contador
+    #    
+    #    # Mostre a figura
+    #    fig.suptitle("Objetos em cena") # Título da figura
+    #    plt.show()
     

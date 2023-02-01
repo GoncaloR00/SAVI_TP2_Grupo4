@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-
+import threading
 import os
 import cv2
 import copy
+import pyttsx3
 import numpy as np
 import matplotlib.pyplot as plt
 import open3d as o3d
@@ -115,6 +116,30 @@ def main():
     #                                         lookat = view['trajectory'][0]['lookat'],
     #                                         up = view['trajectory'][0]['up'])
 
+   
+
+    #def plot_images():
+    ## Defina o número de subplots
+    #    n_rows, n_cols = 5, 5
+#
+    #    # Crie uma figura e adicione subplots
+    #    fig, axs = plt.subplots(n_rows, n_cols, figsize=(10, 7)) # figsize=(width, height)
+#
+    #    counter = 00
+    #    # Itera sobre cada subplot e adiciona uma imagem com título e legenda
+    #    for i in range(n_rows):
+    #        for j in range(n_cols):
+    #            axs[i, j].imshow(np.random.rand(10,10)) # Adiciona uma imagem aleatória
+    #            axs[i, j].set_title(f"Objeto {counter:02d}", pad = -10) # pad = -10 para não sobrescrever o título
+    #            axs[i, j].axis("off") # Desativa os eixos
+    #            #axs[i, j].set_xlabel("Eixo X")
+    #            #axs[i, j].set_ylabel("Eixo Y")
+    #            counter += 1 # Incrementa o contador
+#
+    #    # Mostre a figura
+    #    fig.suptitle("Objetos em cena") # Título da figura
+    #    plt.show()
+
     #make a more complex window to show 3d objects labels
 
     app = gui.Application.instance
@@ -127,6 +152,7 @@ def main():
     material = rendering.Material() #rendering.materialrecord (outras versoes de open3d)
     material.shader = "defaultUnlit"
     material.point_size = 3 * w.scaling
+    
 
     
 
@@ -148,8 +174,11 @@ def main():
     widget3d.setup_camera(60.0, bbox, bbox.get_center())
     w.add_child(widget3d)
     app.run()
-
-    #text to speech
+    #app.run_in_thread(plot_images)
+    
+    
+    
+    #text to speech ( em gtts) criaçao de arquivo mp3
     def generate_audio(objects_properties):
         message = ""
         for obj in objects_properties:
@@ -159,7 +188,7 @@ def main():
         myobj = gTTS(text=message, lang=language, slow=False)
         myobj.save("Speak_objetos.mp3")
 
-        #os.system("Speak_objetos.mp3")
+    #    os.system("Speak_objetos.mp3")
     
     #table of info of objects
     #x = PrettyTable() #table default
@@ -177,15 +206,7 @@ def main():
     generate_audio(p.objects_properties)
 
 
-    #text to speech
-    #nao funciona no meu pc
-    #engine = pyttsx3.init()
-    #engine.say("I will speak this text")
-    ##for obj in p.objects_properties:
-    #    #message = "O objeto " + str(obj['idx']) + " tem uma área de " + str(round(obj['area'] * 10000, 0)) + " cm2 e um volume de " + str(round(obj['volume'] * 100000, 0)) + " cm3."
-    #    #engine.say(message)
-#
-    #engine.runAndWait()
+    
 
     #-------------------------------------------------
     #plot de imagens objetos
@@ -194,10 +215,10 @@ def main():
     
     # Defina o número de subplots
     n_rows, n_cols = 5, 5
-    
+
     # Crie uma figura e adicione subplots
     fig, axs = plt.subplots(n_rows, n_cols, figsize=(10, 7)) # figsize=(width, height)
-    
+
     counter = 00
     # Itera sobre cada subplot e adiciona uma imagem com título e legenda
     for i in range(n_rows):
@@ -208,10 +229,20 @@ def main():
             #axs[i, j].set_xlabel("Eixo X")
             #axs[i, j].set_ylabel("Eixo Y")
             counter += 1 # Incrementa o contador
-    
+
     # Mostre a figura
     fig.suptitle("Objetos em cena") # Título da figura
     plt.show()
+
+    #text to speech
+    engine = pyttsx3.init()
+    engine.say("I will speak this text")
+    for obj in p.objects_properties:
+        message = "O objeto " + str(obj['idx']) + " tem uma área de " + str(round(obj['area'] * 10000, 0)) + " centrímetros quadrados e um volume de " + str(round(obj['volume'] * 100000, 0)) + " centrímetros cúbicos. "
+        engine.say(message)
+
+    engine.runAndWait()
+
 
 
 
